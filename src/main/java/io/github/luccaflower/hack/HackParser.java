@@ -42,7 +42,6 @@ public class HackParser implements Parser<HackParser.AssemblyContext> {
         return A_INSTRUCTION.or(LABEL_INSTRUCTION).or(C_INSTRUCTION).or(COMMENT)
                 .repeating()
                 .andSkip(Parser.eof())
-                .map(ArrayDeque::new)
                 .map(AssemblyContext::new)
                 .tryParse(input);
     }

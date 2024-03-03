@@ -1,7 +1,7 @@
 package io.github.luccaflower.hack;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.ArrayDeque;
+import java.util.Queue;
 import java.util.function.BiFunction;
 import java.util.function.Function;
 import java.util.regex.Pattern;
@@ -74,8 +74,8 @@ public interface Parser<T> {
         };
     }
 
-    default Parser<List<T>> repeating() {
-        return in -> repeating(new ArrayList<>()).tryParse(in);
+    default Parser<Queue<T>> repeating() {
+        return in -> repeating(new ArrayDeque<>()).tryParse(in);
     }
 
     default Parser<T> andSkip(Parser<?> other) {
@@ -86,13 +86,13 @@ public interface Parser<T> {
         return andThen(other).map(Pair::right);
     }
 
-    private Parser<List<T>> repeating(List<T> parsed) {
+    private Parser<Queue<T>> repeating(Queue<T> parsed) {
         return in -> {
             try {
                 var result = tryParse(in);
-                var list = new ArrayList<>(parsed);
-                list.add(result.parsed());
-                return repeating(list).tryParse(result.rest());
+                var queue = new ArrayDeque<>(parsed);
+                queue.add(result.parsed());
+                return repeating(queue).tryParse(result.rest());
             } catch (ParseException ignored) {
                 return new Parsed<>(parsed, in);
             }
