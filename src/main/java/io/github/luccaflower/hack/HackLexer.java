@@ -26,7 +26,7 @@ public class HackLexer implements Parser<HackLexer.LexedInstructions> {
             .skipAnd(LITERAL_A_INSTRUCTION.or(SYMBOLIC_A_INSTRUCTION))
             .andSkip(Parser.eol().or(Parser.eof()).or(COMMENT.map(Object::toString))); //map comment to string to satisfy type bounds
 
-    public static final Parser<HackInstruction.AluInstruction> ALU_INSTRUCTION = Parser.regex("([ADM][+\\-&|][ADM]|0|1)")
+    public static final Parser<HackInstruction.AluInstruction> ALU_INSTRUCTION = Parser.regex("([ADM][+\\-&|][ADM]|0|1|[ADM]{1,3})")
             .map(HackInstruction.AluInstruction::from);
     public static final Parser<HackInstruction.CJumpCode> JUMP_INSTRUCTION = Parser.string(";")
             .skipAnd(Parser.regex("\\w{3}").map(HackInstruction.CJumpCode::valueOf))

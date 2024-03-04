@@ -55,6 +55,16 @@ class HackLexerTest {
     }
 
     @Test
+    void assignOneRegisterToAnother() throws Parser.ParseException {
+        var expected = new HackInstruction.CInstruction(
+                HackInstruction.AluInstruction.A,
+                HackInstruction.CDest.D,
+                HackInstruction.CJumpCode.NONE);
+        assertThat(parser.parse("D=A").instructions().remove())
+                .isEqualTo(expected);
+    }
+
+    @Test
     void commentOnSameLineAsAInstruction() throws Parser.ParseException {
         var expected = new HackInstruction.SymbolicA("symbolic");
         assertThat(parser.parse("@symbolic //a symbol").instructions().remove()).isEqualTo(expected);
@@ -67,6 +77,12 @@ class HackLexerTest {
                 HackInstruction.CDest.NO_DEST,
                 HackInstruction.CJumpCode.JEQ);
         assertThat(parser.parse("0;JEQ").instructions().remove())
+                .isEqualTo(expected);
+    }
+    @Test
+    void firstLineComment() throws Parser.ParseException {
+        var expected = new HackInstruction.NullInstruction();
+        assertThat(parser.parse("// This file is part of www.nand2tetris.org\n").instructions().remove())
                 .isEqualTo(expected);
     }
 }

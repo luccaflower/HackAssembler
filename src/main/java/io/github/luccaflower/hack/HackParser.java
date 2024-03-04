@@ -76,7 +76,7 @@ public class HackParser {
         };
     }
     private static String binaryFrom(HackInstruction.LiteralA a) {
-        return Integer.toBinaryString(a.address());
+        return Integer.toBinaryString(a.address()  | 0x10000).substring(1);
     }
 
     private static String binaryFrom(HackInstruction.CInstruction c) {

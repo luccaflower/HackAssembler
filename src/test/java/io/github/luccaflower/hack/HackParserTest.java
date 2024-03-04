@@ -22,7 +22,7 @@ class HackParserTest {
     }
 
     @Test
-    void AssingAPlusDToM() {
+    void AddingAPlusDToM() {
         HackInstruction.CInstruction cInstruction = new HackInstruction.CInstruction(HackInstruction.AluInstruction.D_PLUS_A, HackInstruction.CDest.M, HackInstruction.CJumpCode.NONE);
         assertThat(parserFrom(cInstruction).toBinaryString())
                 .isEqualTo("1110000010001000");

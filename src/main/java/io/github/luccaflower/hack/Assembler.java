@@ -12,14 +12,23 @@ public class Assembler {
         } else {
             filename = args[0];
         }
+        if (!filename.endsWith(".asm")) {
+            throw new IllegalArgumentException("Invalid filename");
+        }
         String machineCode;
         try (var input = new BufferedReader(new InputStreamReader(new FileInputStream(filename)))) {
             var assembly = input.lines().collect(Collectors.joining("\n"));
             var lexed = new HackLexer().parse(assembly);
             machineCode = new HackParser(lexed).toBinaryString();
         }
-        try (var output = new BufferedOutputStream(new FileOutputStream(filename.replace(".asm", ".hack")))) {
-            output.write(machineCode.getBytes(StandardCharsets.UTF_8));
+
+        String outputFilename = filename.replace(".asm", ".hack");
+        File outputFile = new File(outputFilename);
+        if (outputFile.exists() && !(outputFile.delete())) {
+            throw new IllegalStateException("Failed to overwrite existing hack file");
+        }
+        try (var output = new FileWriter(outputFilename, false)) {
+            output.write(machineCode);
         }
     }
 
