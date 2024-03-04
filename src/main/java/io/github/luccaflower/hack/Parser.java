@@ -36,7 +36,7 @@ public interface Parser<T> {
     }
 
     static Parser<String> eol() {
-        return string("\n");
+        return string("\n").or(eof());
     }
 
     static Parser<String> eof() {

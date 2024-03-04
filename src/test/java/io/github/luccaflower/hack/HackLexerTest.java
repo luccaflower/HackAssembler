@@ -6,9 +6,9 @@ import java.util.regex.Pattern;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-class HackParserTest {
+class HackLexerTest {
 
-    private final HackParser parser = new HackParser();
+    private final HackLexer parser = new HackLexer();
 
     @Test
     void parsesAInstructionLiteral() throws Parser.ParseException {
@@ -25,7 +25,7 @@ class HackParserTest {
     }
     @Test
     void parsesSeveralAInstructionLiterals() throws Parser.ParseException {
-        HackParser.AssemblyContext result = parser.parse("@1\n@2");
+        HackLexer.LexedInstructions result = parser.parse("@1\n@2");
         assertThat(result.instructions().remove())
                 .isEqualTo(new HackInstruction.LiteralA((short) 1));
         assertThat(result.instructions().remove())
@@ -46,12 +46,27 @@ class HackParserTest {
 
     @Test
     void addsAToD() throws Parser.ParseException {
-        HackInstruction.CInstruction expected = new HackInstruction.CInstruction(
-                new HackInstruction.AluInstruction(HackInstruction.AluInstructionCode.D_PLUS_A),
-                new HackInstruction.CDest(HackInstruction.CDestCode.D),
-                new HackInstruction.CJump(HackInstruction.JumpCode.NONE));
+        var expected = new HackInstruction.CInstruction(
+                HackInstruction.AluInstruction.D_PLUS_A,
+                HackInstruction.CDest.D,
+                HackInstruction.CJumpCode.NONE);
         assertThat(parser.parse("D=D+A").instructions().remove())
                 .isEqualTo(expected);
     }
 
+    @Test
+    void commentOnSameLineAsAInstruction() throws Parser.ParseException {
+        var expected = new HackInstruction.SymbolicA("symbolic");
+        assertThat(parser.parse("@symbolic //a symbol").instructions().remove()).isEqualTo(expected);
+    }
+
+    @Test
+    void jumpInstructionWithoutAssignment() throws Parser.ParseException {
+        var expected = new HackInstruction.CInstruction(
+                HackInstruction.AluInstruction.ZERO,
+                HackInstruction.CDest.NO_DEST,
+                HackInstruction.CJumpCode.JEQ);
+        assertThat(parser.parse("0;JEQ").instructions().remove())
+                .isEqualTo(expected);
+    }
 }

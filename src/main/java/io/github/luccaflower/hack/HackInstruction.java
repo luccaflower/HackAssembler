@@ -1,25 +1,24 @@
 package io.github.luccaflower.hack;
 
-public sealed interface HackInstruction permits HackInstruction.AInstruction, HackInstruction.LabelInstruction, HackInstruction.CInstruction, HackInstruction.NullInstruction {
-    sealed interface AInstruction extends HackInstruction {
+public sealed interface HackInstruction permits
+        HackInstruction.LiteralA,
+        HackInstruction.SymbolicA,
+        HackInstruction.LabelInstruction,
+        HackInstruction.CInstruction,
+        HackInstruction.NullInstruction {
+    record LiteralA(short address) implements HackInstruction {
     }
 
-    record LiteralA(short address) implements AInstruction {
-    }
-
-    record SymbolicA(String name) implements AInstruction {}
+    record SymbolicA(String name) implements HackInstruction {}
 
     record LabelInstruction(String label) implements HackInstruction {
     }
 
-    record CInstruction(AluInstruction cOut, CDest dest, CJump jump) implements HackInstruction {
+    record CInstruction(AluInstruction alu, CDest dest, CJumpCode jump) implements HackInstruction {
 
     }
-    record AluInstruction(AluInstructionCode alu) {}
-    record CDest(CDestCode dest) {}
-    record CJump(JumpCode code) {}
 
-    enum AluInstructionCode {
+    enum AluInstruction {
         ZERO(0b0101010),
         ONE(0b111111),
         MINUS_ONE(0b0111010),
@@ -50,7 +49,7 @@ public sealed interface HackInstruction permits HackInstruction.AInstruction, Ha
         D_OR_M(D_OR_A.bytecode()+0b1000000);
 
         private final int bytecode;
-        AluInstructionCode(int bytecode) {
+        AluInstruction(int bytecode) {
             this.bytecode = bytecode;
         }
 
@@ -58,7 +57,7 @@ public sealed interface HackInstruction permits HackInstruction.AInstruction, Ha
             return bytecode;
         }
 
-        public static AluInstructionCode from(String instruction) {
+        public static AluInstruction from(String instruction) {
             return switch (instruction) {
                 case "0" -> ZERO;
                 case "1" -> ONE;
@@ -93,7 +92,7 @@ public sealed interface HackInstruction permits HackInstruction.AInstruction, Ha
             };
         }
     }
-    enum CDestCode {
+    enum CDest {
 
         NO_DEST(0b000),
         M(0b001),
@@ -104,10 +103,10 @@ public sealed interface HackInstruction permits HackInstruction.AInstruction, Ha
         AD(A.destination() + D.destination()),
         ADM(AD.destination() + M.destination());
         private final int destination;
-        CDestCode(int destination) {
+        CDest(int destination) {
             this.destination = destination;
         }
-        public static CDestCode from(String instruction) {
+        public static CDest from(String instruction) {
             return switch (instruction) {
                 case "D" -> D;
                 case "A" -> A;
@@ -125,7 +124,7 @@ public sealed interface HackInstruction permits HackInstruction.AInstruction, Ha
         }
     }
 
-    enum JumpCode {
+    enum CJumpCode {
 
         NONE(0b000),
         JGT(0b001),
@@ -137,7 +136,7 @@ public sealed interface HackInstruction permits HackInstruction.AInstruction, Ha
         JMP(0b111);
         private final int condition;
 
-        JumpCode(int condition) {
+        CJumpCode(int condition) {
             this.condition = condition;
         }
         public int condition() {
