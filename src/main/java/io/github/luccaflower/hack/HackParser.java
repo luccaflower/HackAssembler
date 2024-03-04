@@ -13,12 +13,13 @@ public class HackParser {
                 .collect(Collectors.toSet());
         HashMap<String, Short> labels = new HashMap<>();
         Set<Short> literals = new HashSet<>();
-        short line = 1;
+        short line = 0;
         for (HackInstruction instruction : lexed.instructions()) {
             switch (instruction) {
                 case HackInstruction.NullInstruction ignored: break;
                 case HackInstruction.LabelInstruction(String name): {
                     labels.put(name, line);
+                    symbols.add(name);
                     break;
                 }
                 case HackInstruction.LiteralA literal: {
@@ -33,7 +34,6 @@ public class HackParser {
                 }
                 case HackInstruction.CInstruction cInstruction: {
                     instructions.put(line++, cInstruction);
-                    line++;
                     break;
                 }
             }
@@ -54,10 +54,10 @@ public class HackParser {
                     inserted = true;
                 }
             }
-            for (Map.Entry<Short, HackInstruction> instruction : instructions.entrySet()) {
-                if (Objects.requireNonNull(instruction.getValue()) instanceof HackInstruction.SymbolicA a) {
-                    instructions.put(instruction.getKey(), new HackInstruction.LiteralA(symbolicMapping.get(a.name())));
-                }
+        }
+        for (Map.Entry<Short, HackInstruction> instruction : instructions.entrySet()) {
+            if (Objects.requireNonNull(instruction.getValue()) instanceof HackInstruction.SymbolicA a) {
+                instructions.put(instruction.getKey(), new HackInstruction.LiteralA(symbolicMapping.get(a.name())));
             }
         }
     }

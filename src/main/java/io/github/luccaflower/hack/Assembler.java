@@ -1,11 +1,10 @@
 package io.github.luccaflower.hack;
 
 import java.io.*;
-import java.nio.charset.StandardCharsets;
 import java.util.stream.Collectors;
 
 public class Assembler {
-    public static void main(String[] args) throws IOException, Parser.ParseException {
+    public static void main(String[] args) throws IOException, Lexer.ParseException {
         String filename;
         if (args.length == 0) {
             filename = "Prog.asm";

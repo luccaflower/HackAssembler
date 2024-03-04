@@ -12,13 +12,13 @@ class HackParserTest {
     @Test
     void aLowValueAInstruction() {
         assertThat(parserFrom(new HackInstruction.LiteralA((short) 4)).toBinaryString())
-                .isEqualTo(Integer.toBinaryString(0x0004));
+                .isEqualTo("0000000000000100");
     }
 
     @Test
     void aHighValueAInstruction() {
         assertThat(parserFrom(new HackInstruction.LiteralA((short) 0x0FFF)).toBinaryString())
-                .isEqualTo(Integer.toBinaryString(0x0FFF));
+                .isEqualTo("0000111111111111");
     }
 
     @Test
@@ -28,6 +28,7 @@ class HackParserTest {
                 .isEqualTo("1110000010001000");
 
     }
+
 
     private static HackParser parserFrom(HackInstruction ...instructions) {
         return new HackParser(new HackLexer.LexedInstructions(new ArrayDeque<>(Arrays.asList(instructions))));

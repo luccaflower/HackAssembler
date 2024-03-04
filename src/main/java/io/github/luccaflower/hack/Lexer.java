@@ -7,14 +7,14 @@ import java.util.function.Function;
 import java.util.regex.Pattern;
 
 @FunctionalInterface
-public interface Parser<T> {
+public interface Lexer<T> {
     default T parse(CharSequence in) throws ParseException {
         return tryParse(in).parsed();
     }
 
     Parsed<T> tryParse(CharSequence in) throws ParseException;
 
-    static Parser<String> regex(Pattern regex) {
+    static Lexer<String> regex(Pattern regex) {
         return in -> {
             var matcher = regex.matcher(in);
             if (matcher.lookingAt()) {
@@ -27,19 +27,19 @@ public interface Parser<T> {
         };
     }
 
-    static Parser<String> regex(String pattern) {
+    static Lexer<String> regex(String pattern) {
         return regex(Pattern.compile(pattern));
     }
 
-    static Parser<String> string(String s) {
+    static Lexer<String> string(String s) {
         return regex(Pattern.compile(Pattern.quote(s)));
     }
 
-    static Parser<String> eol() {
+    static Lexer<String> eol() {
         return string("\n").or(eof());
     }
 
-    static Parser<String> eof() {
+    static Lexer<String> eof() {
         return in -> {
             if (!in.isEmpty()) {
                 throw new ParseException("expected EOF");
@@ -49,14 +49,14 @@ public interface Parser<T> {
         };
     }
 
-    default <U> Parser<U> map(Function<? super T, ? extends U> f) {
+    default <U> Lexer<U> map(Function<? super T, ? extends U> f) {
         return in -> {
             var parsed = tryParse(in);
             return new Parsed<>(f.apply(parsed.parsed()), parsed.rest());
         };
     }
 
-    default <U> Parser<Pair<T, U>> andThen(Parser<U> other) {
+    default <U> Lexer<Pair<T, U>> andThen(Lexer<U> other) {
         return in -> {
             var first = tryParse(in);
             var second = other.tryParse(first.rest());
@@ -64,7 +64,7 @@ public interface Parser<T> {
         };
     }
 
-    default Parser<T> or(Parser<T> other) {
+    default Lexer<T> or(Lexer<T> other) {
         return in -> {
             try {
                 return tryParse(in);
@@ -74,19 +74,19 @@ public interface Parser<T> {
         };
     }
 
-    default Parser<Queue<T>> repeating() {
+    default Lexer<Queue<T>> repeating() {
         return in -> repeating(new ArrayDeque<>()).tryParse(in);
     }
 
-    default Parser<T> andSkip(Parser<?> other) {
+    default Lexer<T> andSkip(Lexer<?> other) {
         return andThen(other).map(Pair::left);
     }
 
-    default <U> Parser<U> skipAnd(Parser<U> other) {
+    default <U> Lexer<U> skipAnd(Lexer<U> other) {
         return andThen(other).map(Pair::right);
     }
 
-    private Parser<Queue<T>> repeating(Queue<T> parsed) {
+    private Lexer<Queue<T>> repeating(Queue<T> parsed) {
         return in -> {
             try {
                 var result = tryParse(in);
