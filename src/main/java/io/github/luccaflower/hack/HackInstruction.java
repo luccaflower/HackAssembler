@@ -7,6 +7,11 @@ public sealed interface HackInstruction permits
         HackInstruction.CInstruction,
         HackInstruction.NullInstruction {
     record LiteralA(short address) implements HackInstruction {
+        public LiteralA {
+            if (address > 0x0FFF) {
+                throw new IllegalArgumentException("Out of range of address space");
+            }
+        }
     }
 
     record SymbolicA(String name) implements HackInstruction {}
@@ -53,8 +58,8 @@ public sealed interface HackInstruction permits
             this.bytecode = bytecode;
         }
 
-        public int bytecode() {
-            return bytecode;
+        public short bytecode() {
+            return (short) (bytecode << 6);
         }
 
         public static AluInstruction from(String instruction) {
@@ -119,8 +124,8 @@ public sealed interface HackInstruction permits
             };
         }
 
-        public int destination() {
-            return destination;
+        public short destination() {
+            return (short) (destination << 3);
         }
     }
 
@@ -139,8 +144,8 @@ public sealed interface HackInstruction permits
         CJumpCode(int condition) {
             this.condition = condition;
         }
-        public int condition() {
-            return condition;
+        public short condition() {
+            return (short) condition;
         }
     }
     record NullInstruction() implements HackInstruction {}
