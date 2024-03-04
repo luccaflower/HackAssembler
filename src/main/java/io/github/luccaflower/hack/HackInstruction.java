@@ -7,11 +7,6 @@ public sealed interface HackInstruction permits
         HackInstruction.CInstruction,
         HackInstruction.NullInstruction {
     record LiteralA(short address) implements HackInstruction {
-        public LiteralA {
-            if (address > 0x0FFF) {
-                throw new IllegalArgumentException("Out of range of address space");
-            }
-        }
     }
 
     record SymbolicA(String name) implements HackInstruction {}
@@ -30,28 +25,28 @@ public sealed interface HackInstruction permits
         D(0b0001100),
         A(0b0110000),
         M(0b1110000),
-        NOT_D(D.bytecode()+1),
-        NOT_A(A.bytecode()+1),
-        NOT_M(M.bytecode()+1),
-        NEGATIVE_D(D.bytecode()+0b11),
-        NEGATIVE_A(A.bytecode()+0b11),
-        NEGATIVE_M(M.bytecode()+0b11),
+        NOT_D(0b0001101),
+        NOT_A(0b0110001),
+        NOT_M(0b1110001),
+        NEGATIVE_D(0b0001111),
+        NEGATIVE_A(0b0110011),
+        NEGATIVE_M(0b1110011),
         D_PLUS_ONE(0b0011111),
-        A_PLUS_ONE(A.bytecode()+0b111),
-        M_PLUS_ONE(M.bytecode()+0b111),
-        D_MINUS_ONE(D.bytecode()+0b10),
-        A_MINUS_ONE(A.bytecode()+0b10),
-        M_MINUS_ONE(M.bytecode()+0b10),
+        A_PLUS_ONE(0b0110111),
+        M_PLUS_ONE(0b1110111),
+        D_MINUS_ONE(0b0001110),
+        A_MINUS_ONE(0b0110010),
+        M_MINUS_ONE(0b1110010),
         D_PLUS_A(0b0000010),
-        D_PLUS_M(D_PLUS_A.bytecode() + 0b1000000),
+        D_PLUS_M(0b1000010),
         D_MINUS_A(0b0010011),
         A_MINUS_D(0b0000111),
-        D_MINUS_M(D_MINUS_A.bytecode() + 0b1000000),
+        D_MINUS_M(0b1010011),
         M_MINUS_D(0b1000111),
         D_AND_A(0b0000000),
         D_AND_M(0b1000000),
         D_OR_A(0b0010101),
-        D_OR_M(D_OR_A.bytecode()+0b1000000);
+        D_OR_M(0b1010101);
 
         private final int bytecode;
         AluInstruction(int bytecode) {

@@ -102,4 +102,23 @@ class HackLexerTest {
         assertThat(lexer.parse("@string.setint$while_exp1").instructions().remove())
                 .isEqualTo(expected);
     }
+
+    @Test
+    void multipleDestinationArguments() throws Lexer.ParseException {
+        var expected = new HackInstruction.CInstruction(HackInstruction.AluInstruction.D_PLUS_A, HackInstruction.CDest.AM, HackInstruction.CJumpCode.NONE);
+        assertThat(lexer.parse("AM=D+A").instructions().remove())
+                .isEqualTo(expected);
+    }
+
+    @Test
+    void AMequalsMminusOne() throws Lexer.ParseException {
+        var expected = new HackInstruction.CInstruction(HackInstruction.AluInstruction.D_MINUS_ONE, HackInstruction.CDest.AM, HackInstruction.CJumpCode.NONE);
+        assertThat(lexer.parse("AM=D-1").instructions().remove()).isEqualTo(expected);
+    }
+
+    @Test
+    void minusOneAluInstruction() throws Lexer.ParseException {
+        var expected = new HackInstruction.CInstruction(HackInstruction.AluInstruction.MINUS_ONE, HackInstruction.CDest.M, HackInstruction.CJumpCode.NONE);
+        assertThat(lexer.parse("M=-1").instructions().remove()).isEqualTo(expected);
+    }
 }

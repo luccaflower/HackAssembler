@@ -22,7 +22,9 @@ public interface Lexer<T> {
                 var parsed = matcher.group();
                 return new Parsed<>(parsed, in.subSequence(end, in.length()));
             } else {
-                throw new ParseException("No match for input");
+                int length = Math.min(20, in.length());
+                String lines = in.toString().substring(0, length);
+                throw new ParseException("No match for input\n" + lines);
             }
         };
     }
@@ -42,7 +44,9 @@ public interface Lexer<T> {
     static Lexer<String> eof() {
         return in -> {
             if (!in.isEmpty()) {
-                throw new ParseException("expected EOF");
+                int length = Math.min(20, in.length());
+                String lines = in.toString().substring(0, length);
+                throw new ParseException("expected EOF\n" + lines);
             } else {
                 return new Parsed<>("", "");
             }
@@ -75,7 +79,21 @@ public interface Lexer<T> {
     }
 
     default Lexer<Queue<T>> repeating() {
-        return in -> repeating(new ArrayDeque<>()).tryParse(in);
+        return in -> {
+            var queue = new ArrayDeque<T>();
+            var thrown = false;
+            var rest = in;
+            while (!thrown) {
+                try {
+                    var parsed = tryParse(rest);
+                    queue.add(parsed.parsed());
+                    rest = parsed.rest();
+                } catch (ParseException e) {
+                    thrown = true;
+                }
+            }
+            return new Parsed<>(queue, rest);
+        };
     }
 
     default Lexer<T> andSkip(Lexer<?> other) {
@@ -84,19 +102,6 @@ public interface Lexer<T> {
 
     default <U> Lexer<U> skipAnd(Lexer<U> other) {
         return andThen(other).map(Pair::right);
-    }
-
-    private Lexer<Queue<T>> repeating(Queue<T> parsed) {
-        return in -> {
-            try {
-                var result = tryParse(in);
-                var queue = new ArrayDeque<>(parsed);
-                queue.add(result.parsed());
-                return repeating(queue).tryParse(result.rest());
-            } catch (ParseException ignored) {
-                return new Parsed<>(parsed, in);
-            }
-        };
     }
 
     record Parsed<T>(T parsed, CharSequence rest) {}

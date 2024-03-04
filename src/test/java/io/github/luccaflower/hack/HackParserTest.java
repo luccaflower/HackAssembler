@@ -29,6 +29,13 @@ class HackParserTest {
 
     }
 
+    @Test
+    void AequalsMminusOne() {
+        var cInstruction = new HackInstruction.CInstruction(HackInstruction.AluInstruction.M_MINUS_ONE, HackInstruction.CDest.A, HackInstruction.CJumpCode.NONE);
+        assertThat(parserFrom(cInstruction).toBinaryString())
+                .isEqualTo("1111110010100000");
+    }
+
 
     private static HackParser parserFrom(HackInstruction ...instructions) {
         return new HackParser(new HackLexer.LexedInstructions(new ArrayDeque<>(Arrays.asList(instructions))));
