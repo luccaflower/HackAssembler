@@ -1,1 +1,2 @@
-src/test/resources/** linguist-vendored=false
+*.asm -linguist-detectable
+*.hack -linguist-detectable
