@@ -16,9 +16,7 @@ public class Assembler {
         }
         String machineCode;
         try (var input = new BufferedReader(new InputStreamReader(new FileInputStream(filename)))) {
-            var assembly = input.lines().collect(Collectors.joining("\n"));
-            var lexed = new HackLexer().parse(assembly);
-            machineCode = new HackParser(lexed).toBinaryString();
+            machineCode = assemble(input);
         }
 
         String outputFilename = filename.replace(".asm", ".hack");
@@ -29,6 +27,14 @@ public class Assembler {
         try (var output = new FileWriter(outputFilename, false)) {
             output.write(machineCode);
         }
+    }
+
+    public static String assemble(BufferedReader input) throws Lexer.ParseException {
+        String machineCode;
+        var assembly = input.lines().collect(Collectors.joining("\n"));
+        var lexed = new HackLexer().parse(assembly);
+        machineCode = new HackParser(lexed).toBinaryString();
+        return machineCode;
     }
 
 

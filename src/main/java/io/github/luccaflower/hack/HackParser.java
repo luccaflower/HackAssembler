@@ -10,18 +10,18 @@ public class HackParser {
         Set<String> symbols = lexed.instructions().stream()
                 .filter(i -> i instanceof HackInstruction.SymbolicA)
                 .map(i -> ((HackInstruction.SymbolicA) i).name())
-                .collect(Collectors.toSet());
+                .collect(Collectors.toCollection(LinkedHashSet::new));
         HashMap<String, Short> labels = new HashMap<>();
         Set<Short> literals = new HashSet<>();
         short line = 0;
         for (HackInstruction instruction : lexed.instructions()) {
             switch (instruction) {
-                case HackInstruction.NullInstruction ignored: break;
                 case HackInstruction.LabelInstruction(String name): {
                     labels.put(name, line);
                     symbols.add(name);
                     break;
                 }
+                case HackInstruction.NullInstruction ignored: break;
                 case HackInstruction.LiteralA literal: {
                     literals.add(literal.address());
                     instructions.put(line++, literal);
@@ -39,6 +39,13 @@ public class HackParser {
             }
         }
         var symbolicMapping = new HashMap<String, Short>();
+        symbolicMapping.put("SCREEN", (short) 0x4000);
+        symbolicMapping.put("KBD", (short) 0x6000);
+        symbolicMapping.put("SP", (short) 0);
+        symbolicMapping.put("LCL", (short) 1);
+        symbolicMapping.put("ARG", (short) 2);
+        symbolicMapping.put("THIS", (short) 3);
+        symbolicMapping.put("THAT", (short) 4);
         short counter = 16;
         for (String symbol : symbols) {
             var inserted = false;
@@ -48,9 +55,11 @@ public class HackParser {
                     inserted = true;
                 } else if (literals.contains(counter)) {
                     counter++;
-                } else {
+                } else if(!symbolicMapping.containsKey(symbol)) {
                     literals.add(counter);
                     symbolicMapping.put(symbol, counter);
+                    inserted = true;
+                } else {
                     inserted = true;
                 }
             }

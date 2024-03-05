@@ -98,10 +98,10 @@ public sealed interface HackInstruction permits
         M(0b001),
         D(0b010),
         A(0b100),
-        MD(M.destination() + D.destination()),
-        AM(A.destination() + M.destination()),
-        AD(A.destination() + D.destination()),
-        ADM(AD.destination() + M.destination());
+        MD(0b011),
+        AM(0b101),
+        AD(0b110),
+        ADM(0b111);
         private final int destination;
         CDest(int destination) {
             this.destination = destination;
@@ -130,9 +130,9 @@ public sealed interface HackInstruction permits
         JGT(0b001),
         JEQ(0b010),
         JLT(0b100),
-        JGE(JGT.condition() + JEQ.condition()),
-        JNE(JGT.condition() + JLT.condition()),
-        JLE(JLT.condition() + JEQ.condition()),
+        JGE(0b011),
+        JNE(0b101),
+        JLE(0b110),
         JMP(0b111);
         private final int condition;
 
