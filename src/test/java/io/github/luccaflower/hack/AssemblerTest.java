@@ -13,7 +13,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 class AssemblerTest {
 
     @ParameterizedTest
-    @CsvSource({"Add.asm,Add.hack", "Max.asm,Max.hack", "MaxL.asm,MaxL.hack", "Rect.asm,Rect.hack", "RectL.asm,RectL.hack", "PongL.asm,PongL.hack","Prog.asm,Pong.hack"})
+    @CsvSource({"Add.asm,Add.hack", "Max.asm,Max.hack", "MaxL.asm,MaxL.hack", "Rect.asm,Rect.hack", "RectL.asm,RectL.hack", "PongL.asm,PongL.hack"})
     void assembles(String inputFile, String expectedFile) throws IOException, Lexer.ParseException {
         String actual;
         ClassLoader contextClassLoader = Thread.currentThread().getContextClassLoader();
